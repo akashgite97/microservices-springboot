@@ -1,11 +1,16 @@
 package com.microservices.userService.usermicroservice.services.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.microservices.userService.usermicroservice.entities.Rating;
 import com.microservices.userService.usermicroservice.entities.User;
 import com.microservices.userService.usermicroservice.exceptions.ResourceNotFoundException;
 import com.microservices.userService.usermicroservice.repository.UserRepository;
@@ -16,6 +21,11 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     public User createUser(User user) {
@@ -44,6 +54,13 @@ public class UserServiceImpl implements UserService {
         User user = this.userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
 
+        // get user ratings form RATING_SERVICE
+        ArrayList<Rating> userRatings = restTemplate
+                .getForObject("http://localhost:8083/api/rating/users/" + user.getId(), ArrayList.class);
+        logger.info("userRatings" + userRatings);
+
+        user.setRatings(userRatings);
+
         return user;
     }
 
@@ -63,31 +80,5 @@ public class UserServiceImpl implements UserService {
 
         this.userRepo.delete(user);
     }
-
-    // private User ToUser(User user){
-
-    // User user = new User();
-
-    // user.setId(user.getId());
-    // user.setName(user.getName());
-    // user.setEmail(user.getEmail());
-    // user.setPassword(user.getPassword());
-    // user.setAbout(user.getAbout());
-
-    // return user;
-    // }
-
-    // private User userToDto(User user){
-
-    // UserDto userDto = new UserDto();
-
-    // userDto.setId(user.getId());
-    // userDto.setName(user.getName());
-    // userDto.setEmail(user.getEmail());
-    // userDto.setPassword(user.getPassword());
-    // userDto.setAbout(user.getAbout());
-
-    // return userDto;
-    // }
 
 }
