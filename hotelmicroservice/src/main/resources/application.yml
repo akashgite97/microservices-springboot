@@ -15,6 +15,17 @@ spring:
         properties: 
             hibernate:
                 dialect: org.hibernate.dialect.MySQL8Dialect
+    application:
+        name: HOTEL-service
+
+eureka:
+    instance:
+        prefer-ip-address: true
+    client: 
+        fetch-registry:true
+        register-with-eureka: true
+        service-url:
+            defaultZone: https://localhost:8761/eureka
 
 
 
