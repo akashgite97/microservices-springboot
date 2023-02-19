@@ -1,8 +1,8 @@
 package com.microservices.hotelservice.hotelmicroservice.services.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,11 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public Hotel createHotel(Hotel hotel) {
-        // int hotelId = UUID.randomUUID().toString();
-        // hotel.setId((hotelId);
-        Hotel savedHotel = this.hotelRepo.save(hotel);
-        return savedHotel;
+        UUID hotelId=UUID.randomUUID();
+        
+        // hotel.setId(hotelId);
+        return this.hotelRepo.save(hotel);
+        
     }
 
     @Override

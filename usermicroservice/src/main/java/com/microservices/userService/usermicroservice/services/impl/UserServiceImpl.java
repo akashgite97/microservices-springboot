@@ -1,15 +1,18 @@
 package com.microservices.userService.usermicroservice.services.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.microservices.userService.usermicroservice.entities.Hotel;
 import com.microservices.userService.usermicroservice.entities.Rating;
 import com.microservices.userService.usermicroservice.entities.User;
 import com.microservices.userService.usermicroservice.exceptions.ResourceNotFoundException;
@@ -55,11 +58,31 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
 
         // get user ratings form RATING_SERVICE
-        ArrayList<Rating> userRatings = restTemplate
-                .getForObject("http://localhost:8083/api/rating/users/" + user.getId(), ArrayList.class);
-        logger.info("userRatings" + userRatings);
+        Rating[] userRatings = restTemplate
+                .getForObject("http://localhost:8083/api/rating/users/"+user.getId(),Rating[].class);
+        logger.info("userRatings123" + userRatings);
 
-        user.setRatings(userRatings);
+         List<Rating> ratings= Arrays.stream(userRatings).toList();
+       // List<Rating> list1=new ArrayList<Rating>(Arrays.asList(userRatings));
+        logger.info("list1" + ratings);
+    
+        List<Rating> ratingListWithHotel = ratings.stream().map(rating -> {
+
+            // api call to hotel service to get hotel details
+            ResponseEntity<Hotel> hotelDetails = restTemplate.getForEntity("http://localhost:8082/api/hotel/get/"+rating.getHotelId(), Hotel.class);
+            Hotel hotel = hotelDetails.getBody();
+            logger.info("hotelDetails" + hotel);
+
+
+            // set hotel rating
+            rating.setHotel(hotel);
+            // return updated reating details with hotel
+
+            return new Rating();
+
+        }).collect(Collectors.toList());
+
+        user.setRatings(ratingListWithHotel);
 
         return user;
     }
