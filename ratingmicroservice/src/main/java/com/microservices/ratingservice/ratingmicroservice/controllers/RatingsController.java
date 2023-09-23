@@ -18,7 +18,7 @@ import com.microservices.ratingservice.ratingmicroservice.entities.Rating;
 import com.microservices.ratingservice.ratingmicroservice.services.RatingService;
 
 @RestController
-@RequestMapping("/api/rating")
+// @RequestMapping("/api/rating")
 public class RatingsController {
 
     @Autowired
@@ -34,7 +34,7 @@ public class RatingsController {
 
         List<Rating> ratings = this.ratingService.getAllRatings();
 
-        return new ResponseEntity<>(ratings, HttpStatus.CREATED);
+        return new ResponseEntity<>(ratings, HttpStatus.OK);
     }
 
     @PostMapping("/create")

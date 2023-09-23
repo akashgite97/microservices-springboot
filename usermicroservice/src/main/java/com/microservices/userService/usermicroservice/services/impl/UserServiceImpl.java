@@ -58,15 +58,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
 
         // get user ratings form RATING_SERVICE
-        Rating[] userRatings = restTemplate
-                .getForObject("http://localhost:8083/api/rating/users/"+user.getId(),Rating[].class);
+        ArrayList<Rating> userRatings = restTemplate
+                .getForObject("http://localhost:8083/api/rating/users/"+user.getId(),ArrayList.class);
         logger.info("userRatings123" + userRatings);
+        System.out.println("userRatings1234" + userRatings);
+        
 
-         List<Rating> ratings= Arrays.stream(userRatings).toList();
-       // List<Rating> list1=new ArrayList<Rating>(Arrays.asList(userRatings));
-        logger.info("list1" + ratings);
+         //List<Rating> ratings= Arrays.asList(userRatings);
+       // List<Rating> ratings=new ArrayList<Rating>(Arrays.asList(userRatings));
+        //logger.info("list1" + ratings);
     
-        List<Rating> ratingListWithHotel = ratings.stream().map(rating -> {
+        /*List<Rating> ratingListWithHotel = userRatings.stream().map(rating -> {
 
             // api call to hotel service to get hotel details
             ResponseEntity<Hotel> hotelDetails = restTemplate.getForEntity("http://localhost:8082/api/hotel/get/"+rating.getHotelId(), Hotel.class);
@@ -80,9 +82,9 @@ public class UserServiceImpl implements UserService {
 
             return new Rating();
 
-        }).collect(Collectors.toList());
-
-        user.setRatings(ratingListWithHotel);
+        }).collect(Collectors.toList());*/
+        user.setRatings(userRatings); 
+  
 
         return user;
     }
